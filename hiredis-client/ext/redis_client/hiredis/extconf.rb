@@ -54,15 +54,7 @@ if RUBY_ENGINE == "ruby" && !RUBY_PLATFORM.match?(/mswin/)
     $CFLAGS << " -O3 "
   end
 
-  cc_version = `#{RbConfig.expand("$(CC) --version".dup)}`
-  if cc_version.match?(/clang/i) && RUBY_PLATFORM =~ /darwin/
-    $LDFLAGS << ' -Wl,-exported_symbols_list,"' << File.join(__dir__, 'export.clang') << '"'
-    if RUBY_VERSION >= "3.2" && RUBY_PATCHLEVEL < 0
-      $LDFLAGS << " -Wl,-exported_symbol,_ruby_abi_version"
-    end
-  elsif cc_version.match?(/gcc/i)
-    $LDFLAGS << ' -Wl,--version-script="' << File.join(__dir__, 'export.gcc') << '"'
-  end
+  append_cflags "-fvisibility=hidden"
 
   $CFLAGS << " -Wno-declaration-after-statement" # Older compilers
   $CFLAGS << " -Wno-compound-token-split-by-macro" # Older rubies on macos
